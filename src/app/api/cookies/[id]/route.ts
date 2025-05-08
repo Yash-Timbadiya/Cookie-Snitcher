@@ -60,7 +60,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    // Ensure params are resolved before accessing properties
+    const resolvedParams = await Promise.resolve(params);
+    const id = parseInt(resolvedParams.id);
 
     if (isNaN(id)) {
       return NextResponse.json(
