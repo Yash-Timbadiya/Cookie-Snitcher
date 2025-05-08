@@ -123,7 +123,18 @@ type CookieEntry = {
   tabId: number;
   tabTitle: string | null;
   favIconUrl: string | null;
-  cookiesData: any[];
+  cookiesData: {
+    name: string;
+    value: string;
+    domain: string;
+    path: string;
+    secure: boolean;
+    httpOnly: boolean;
+    hostOnly: boolean;
+    sameSite: string;
+    session: boolean;
+    storeId: string;
+  }[];
   ipAddress: string | null;
   createdAt: string;
 };
@@ -216,12 +227,12 @@ export default function Home() {
   // When component mounts, store the initial pagination total
   useEffect(() => {
     previousTotalRef.current = pagination.total;
-  }, []);
+  }, [pagination.total]);
 
   // Initial data fetch
   useEffect(() => {
     fetchCookies(1, urlFilter);
-  }, [fetchCookies]);
+  }, [fetchCookies, urlFilter]);
 
   // Setup auto-refresh interval
   useEffect(() => {

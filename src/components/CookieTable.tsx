@@ -290,6 +290,7 @@
 import React, { useState } from "react";
 import { Cookie } from "@/db/schema";
 import AlertDialog from "./AlertDialog";
+import Image from "next/image";
 
 type CookieEntryProps = {
   id: number;
@@ -312,7 +313,6 @@ type CookieTableProps = {
 export default function CookieTable({
   entries,
   isLoading,
-  refreshCookies,
   onEntryDeleted,
 }: CookieTableProps) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
@@ -456,7 +456,9 @@ export default function CookieTable({
               >
                 <td className="p-4 flex items-center">
                   {entry.favIconUrl && (
-                    <img
+                    <Image
+                      width={16}
+                      height={16}
                       src={entry.favIconUrl}
                       alt="Favicon"
                       className="w-4 h-4 mr-2"

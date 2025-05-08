@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
       countQuery.where(eq(cookies.url, url));
     }
 
-    const totalCount = await countQuery as { count: bigint }[];
+    const totalCount = (await countQuery) as { count: bigint }[];
     const total = parseInt(totalCount[0].count.toString());
 
     return NextResponse.json({

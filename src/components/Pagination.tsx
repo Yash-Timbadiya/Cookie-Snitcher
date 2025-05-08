@@ -17,7 +17,7 @@ export default function Pagination({
     pages.push(1);
 
     // Calculate range of page numbers to show
-    let startPage = Math.max(2, currentPage - Math.floor(maxPageButtons / 2));
+    const startPage = Math.max(2, currentPage - Math.floor(maxPageButtons / 2));
     let endPage = Math.min(totalPages - 1, startPage + maxPageButtons - 2);
 
     // Adjust if we're at the end of the range

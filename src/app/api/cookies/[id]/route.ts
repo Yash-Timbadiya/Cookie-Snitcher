@@ -1,10 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { cookies } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 // GET handler to fetch a specific cookie entry by ID
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const id = parseInt(params.id);
 
@@ -52,9 +55,14 @@ export async function GET({ params }: { params: { id: string } }) {
 }
 
 // DELETE handler to remove a specific cookie entry
-export async function DELETE({ params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const id = parseInt(params.id);
+    // Ensure params are resolved before accessing properties
+    const resolvedParams = await Promise.resolve(params);
+    const id = parseInt(resolvedParams.id);
 
     if (isNaN(id)) {
       return NextResponse.json(
