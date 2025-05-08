@@ -14,7 +14,7 @@ export default function About() {
           browser.
         </p>
         <p className="text-gray-300">
-          Whether you're a developer, privacy enthusiast, or security
+          Whether you&apos;re a developer, privacy enthusiast, or security
           professional, Cookie Snitcher provides valuable insights into how
           websites use cookies to track and store information.
         </p>

@@ -108,13 +108,13 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error storing cookies:", error);
     return NextResponse.json(
       {
         success: false,
         message: "Failed to store cookies",
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
@@ -163,13 +163,13 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching cookies:", error);
     return NextResponse.json(
       {
         success: false,
         message: "Failed to fetch cookies",
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

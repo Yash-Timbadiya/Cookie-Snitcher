@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { cookies } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 // GET handler to fetch a specific cookie entry by ID
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET({ params }: { params: { id: string } }) {
   try {
     const id = parseInt(params.id);
 
@@ -41,13 +38,13 @@ export async function GET(
       success: true,
       data: data[0],
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error(`Error fetching cookie entry with ID ${params.id}:`, error);
     return NextResponse.json(
       {
         success: false,
         message: "Failed to fetch cookie entry",
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
@@ -55,14 +52,9 @@ export async function GET(
 }
 
 // DELETE handler to remove a specific cookie entry
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE({ params }: { params: { id: string } }) {
   try {
-    // Ensure params are resolved before accessing properties
-    const resolvedParams = await Promise.resolve(params);
-    const id = parseInt(resolvedParams.id);
+    const id = parseInt(params.id);
 
     if (isNaN(id)) {
       return NextResponse.json(
@@ -94,13 +86,13 @@ export async function DELETE(
       message: "Cookie entry deleted successfully",
       id: result[0].id,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error(`Error deleting cookie entry with ID ${params.id}:`, error);
     return NextResponse.json(
       {
         success: false,
         message: "Failed to delete cookie entry",
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
