@@ -18,7 +18,7 @@ export default function FilterBar({ onFilter }: FilterBarProps) {
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded-lg mb-6">
+    <div className="bg-gray-800 p-4 rounded-lg mb-6 w-full">
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <label
