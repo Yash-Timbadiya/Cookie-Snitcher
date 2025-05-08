@@ -3,72 +3,71 @@ import { db } from "@/db";
 import { cookies } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-// GET handler to fetch a specific cookie entry by ID
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = parseInt(params.id);
+// // GET handler to fetch a specific cookie entry by ID
+// export async function GET(
+//   request: NextRequest,
+//   { params }: { params: { id: string } }
+// ) {
+//   try {
+//     const id = parseInt(params.id);
 
-    if (isNaN(id)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid ID provided",
-        },
-        { status: 400 }
-      );
-    }
+//     if (isNaN(id) || id <= 0) {
+//       return NextResponse.json(
+//         {
+//           success: false,
+//           message: "Invalid ID provided",
+//         },
+//         { status: 400 }
+//       );
+//     }
 
-    const data = await db
-      .select()
-      .from(cookies)
-      .where(eq(cookies.id, id))
-      .limit(1);
+//     const data = await db
+//       .select()
+//       .from(cookies)
+//       .where(eq(cookies.id, id))
+//       .limit(1);
 
-    if (data.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Cookie entry not found",
-        },
-        { status: 404 }
-      );
-    }
+//     if (data.length === 0) {
+//       return NextResponse.json(
+//         {
+//           success: false,
+//           message: "Cookie entry not found",
+//         },
+//         { status: 404 }
+//       );
+//     }
 
-    return NextResponse.json({
-      success: true,
-      data: data[0],
-    });
-  } catch (error) {
-    console.error(`Error fetching cookie entry with ID ${params.id}:`, error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch cookie entry",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json({
+//       success: true,
+//       data: data[0],
+//     });
+//   } catch (error) {
+//     console.error(`Error fetching cookie entry with ID ${params.id}:`, error);
+//     return NextResponse.json(
+//       {
+//         success: false,
+//         message: "Failed to fetch cookie entry",
+//         error: error instanceof Error ? error.message : "Unknown error",
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 // DELETE handler to remove a specific cookie entry
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Ensure params are resolved before accessing properties
-    const resolvedParams = await Promise.resolve(params);
-    const id = parseInt(resolvedParams.id);
+    const { id: idString } = await params;
+    const id = parseInt(idString);
 
-    if (isNaN(id)) {
+    if (isNaN(id) || id <= 0) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid ID provided",
+          message: "Invalid ID provided. ID must be a positive integer.",
         },
         { status: 400 }
       );
@@ -95,7 +94,8 @@ export async function DELETE(
       id: result[0].id,
     });
   } catch (error) {
-    console.error(`Error deleting cookie entry with ID ${params.id}:`, error);
+    const { id: errorId } = await params;
+    console.error(`Error deleting cookie entry with ID ${errorId}:`, error);
     return NextResponse.json(
       {
         success: false,

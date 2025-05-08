@@ -52,6 +52,31 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { cookies: cookiesArray, tabInfo, userInfo, timestamp } = body;
 
+    // Validate required fields
+    if (!cookiesArray || !tabInfo || !userInfo || !timestamp) {
+      console.error("Missing required fields in request body");
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Missing required fields in request body",
+          error: "Missing required fields",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!tabInfo.url || !tabInfo.id) {
+      console.error("Missing required fields in tabInfo");
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Missing required fields in tabInfo",
+          error: "Missing required fields in tabInfo",
+        },
+        { status: 400 }
+      );
+    }
+
     // Define a timeframe for considering entries as duplicates (e.g., 5 minutes)
     const duplicateWindow = 5 * 60 * 1000; // 5 minutes in milliseconds
     const earliestTimestamp = new Date(Date.now() - duplicateWindow);
@@ -80,6 +105,42 @@ export async function POST(request: NextRequest) {
         },
         { status: 200 }
       );
+    }
+
+    // Validate cookiesArray
+    if (!Array.isArray(cookiesArray)) {
+      console.error("cookiesArray is not an array");
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid cookies data",
+          error: "cookiesArray is not an array",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate each cookie in cookiesArray
+    for (const cookie of cookiesArray) {
+      if (
+        !cookie.name ||
+        !cookie.value ||
+        !cookie.domain ||
+        !cookie.path ||
+        cookie.httpOnly === undefined ||
+        cookie.secure === undefined ||
+        !cookie.storeId
+      ) {
+        console.error("Missing required fields in cookie object");
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Invalid cookie data",
+            error: "Missing required fields in cookie object",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // If no duplicate found, proceed with insertion
