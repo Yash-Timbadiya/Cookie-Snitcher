@@ -1,14 +1,88 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { cookies } from "@/db/schema";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql, gte, and } from "drizzle-orm";
 
 // POST handler to store cookies
+// export async function POST(request: NextRequest) {
+//   try {
+//     const body = await request.json();
+//     const { cookies: cookiesArray, tabInfo, userInfo, timestamp } = body;
+
+//     const result = await db
+//       .insert(cookies)
+//       .values({
+//         url: tabInfo.url,
+//         tabId: tabInfo.id,
+//         tabTitle: tabInfo.title,
+//         favIconUrl: tabInfo.favIconUrl || null,
+//         incognito: tabInfo.incognito || false,
+//         cookiesData: cookiesArray,
+//         ipAddress: userInfo.ipAddress,
+//         userAgent: userInfo.browserInfo.userAgent,
+//         language: userInfo.browserInfo.language,
+//         timeZone: userInfo.browserInfo.timeZone,
+//         createdAt: new Date(timestamp),
+//       })
+//       .returning({ id: cookies.id });
+
+//     return NextResponse.json(
+//       {
+//         success: true,
+//         message: "Cookies stored successfully",
+//         id: result[0].id,
+//       },
+//       { status: 201 }
+//     );
+//   } catch (error: any) {
+//     console.error("Error storing cookies:", error);
+//     return NextResponse.json(
+//       {
+//         success: false,
+//         message: "Failed to store cookies",
+//         error: error.message,
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { cookies: cookiesArray, tabInfo, userInfo, timestamp } = body;
 
+    // Define a timeframe for considering entries as duplicates (e.g., 5 minutes)
+    const duplicateWindow = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const earliestTimestamp = new Date(Date.now() - duplicateWindow);
+
+    // Check if we already have a similar entry
+    const existingEntries = await db
+      .select({ id: cookies.id })
+      .from(cookies)
+      .where(
+        and(
+          eq(cookies.url, tabInfo.url),
+          eq(cookies.tabId, tabInfo.id),
+          gte(cookies.createdAt, earliestTimestamp)
+        )
+      )
+      .limit(1);
+
+    // If a similar entry exists, return success but indicate it was a duplicate
+    if (existingEntries.length > 0) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Duplicate entry detected, skipped storing cookies",
+          id: existingEntries[0].id,
+          isDuplicate: true,
+        },
+        { status: 200 }
+      );
+    }
+
+    // If no duplicate found, proceed with insertion
     const result = await db
       .insert(cookies)
       .values({
