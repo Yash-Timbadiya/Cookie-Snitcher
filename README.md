@@ -23,7 +23,8 @@ This web app will allow users to view the cookies stored by the Chrome Extension
 ### 3. Fetching Data from Backend
 
 1. Use `getServerSideProps` or `getStaticProps` to fetch data from the backend.
-2. Display the cookies in a table format with date.
+2. Display all the details. also add copy button to copy the value of the all cookie in array format.
+3. if shorting or filtering is required, add that feature.
 
 ### 4. Backend Integration
 
