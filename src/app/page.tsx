@@ -53,7 +53,6 @@ export default function Home() {
     pages: 0,
   });
   const [urlFilter, setUrlFilter] = useState("");
-  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastFetchTimeRef = useRef<number>(0);
   const [isBackgroundRefreshing, setIsBackgroundRefreshing] = useState(false);
   const [toast, setToast] = useState({
