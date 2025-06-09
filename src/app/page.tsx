@@ -48,7 +48,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
-    limit: 10,
+    limit: 25,
     total: 0,
     pages: 0,
   });
